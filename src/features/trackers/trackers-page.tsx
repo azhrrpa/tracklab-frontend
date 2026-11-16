@@ -6,7 +6,6 @@ import { Card, PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { DataTable, PageSizeSelect, Pagination, SearchInput, type Column } from "@/components/ui/data-table";
 import { Badge, BoolIcon } from "@/components/ui/feedback";
-import { Checkbox } from "@/components/ui/form";
 import { ConfirmDialog } from "@/components/ui/modal";
 import { RowActions } from "@/components/ui/row-actions";
 import { HistoryDialog } from "@/features/audit/history-dialog";
@@ -33,7 +32,6 @@ export function TrackersPage() {
   const [editing, setEditing] = useState<Tracker | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [deleting, setDeleting] = useState<Tracker | null>(null);
-  const [hardDelete, setHardDelete] = useState(false);
   const [history, setHistory] = useState<Tracker | null>(null);
 
   const rows = query.data?.items ?? [];
@@ -77,10 +75,7 @@ export function TrackersPage() {
               icon: <Trash2 className="h-4 w-4" />,
               danger: true,
               hidden: !can.delete,
-              onSelect: () => {
-                setHardDelete(false);
-                setDeleting(t);
-              },
+              onSelect: () => setDeleting(t),
             },
           ]}
         />
@@ -164,27 +159,13 @@ export function TrackersPage() {
       <ConfirmDialog
         open={Boolean(deleting)}
         title={`Delete tracker ${deleting?.code ?? ""}?`}
-        message={
-          hardDelete
-            ? "This permanently removes the tracker. It cannot be undone."
-            : "The tracker will be deactivated and hidden from lists. Its history is kept."
-        }
-        confirmLabel={hardDelete ? "Delete permanently" : "Delete"}
+        message="The tracker will be deactivated and hidden from lists. Its history is kept in the audit trail."
+        confirmLabel="Delete"
         danger
         loading={remove.isPending}
         onClose={() => setDeleting(null)}
-        onConfirm={() =>
-          deleting && remove.mutate({ id: deleting.id, hard: hardDelete }, { onSuccess: () => setDeleting(null) })
-        }
-      >
-        <Checkbox
-          id="tracker-hard-delete"
-          label="Delete permanently"
-          description="Remove the row from the database instead of deactivating it."
-          checked={hardDelete}
-          onChange={(e) => setHardDelete(e.target.checked)}
-        />
-      </ConfirmDialog>
+        onConfirm={() => deleting && remove.mutate({ id: deleting.id }, { onSuccess: () => setDeleting(null) })}
+      />
 
       <HistoryDialog
         open={Boolean(history)}

@@ -8,7 +8,7 @@ import { Card, PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { DataTable, PageSizeSelect, Pagination, SearchInput, type Column } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/feedback";
-import { Checkbox, Field, Input, Select } from "@/components/ui/form";
+import { Field, Input, Select } from "@/components/ui/form";
 import { ConfirmDialog } from "@/components/ui/modal";
 import { RowActions } from "@/components/ui/row-actions";
 import { HistoryDialog } from "@/features/audit/history-dialog";
@@ -50,7 +50,6 @@ export function RequestsPage() {
   const [editing, setEditing] = useState<LabRequest | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [deleting, setDeleting] = useState<LabRequest | null>(null);
-  const [hardDelete, setHardDelete] = useState(false);
   const [history, setHistory] = useState<LabRequest | null>(null);
 
   const rows = query.data?.items ?? [];
@@ -99,10 +98,7 @@ export function RequestsPage() {
               icon: <Trash2 className="h-4 w-4" />,
               danger: true,
               hidden: !can.delete,
-              onSelect: () => {
-                setHardDelete(false);
-                setDeleting(r);
-              },
+              onSelect: () => setDeleting(r),
             },
           ]}
         />
@@ -236,25 +232,13 @@ export function RequestsPage() {
       <ConfirmDialog
         open={Boolean(deleting)}
         title={`Delete request ${deleting?.projectCode ?? ""}?`}
-        message={
-          hardDelete
-            ? "This permanently removes the request. It cannot be undone."
-            : "The request will be deactivated and hidden from lists. Its history is kept."
-        }
-        confirmLabel={hardDelete ? "Delete permanently" : "Delete"}
+        message="The request will be deactivated and hidden from lists. Its history is kept in the audit trail."
+        confirmLabel="Delete"
         danger
         loading={remove.isPending}
         onClose={() => setDeleting(null)}
-        onConfirm={() => deleting && remove.mutate({ id: deleting.id, hard: hardDelete }, { onSuccess: () => setDeleting(null) })}
-      >
-        <Checkbox
-          id="request-hard-delete"
-          label="Delete permanently"
-          description="Remove the row from the database instead of deactivating it."
-          checked={hardDelete}
-          onChange={(e) => setHardDelete(e.target.checked)}
-        />
-      </ConfirmDialog>
+        onConfirm={() => deleting && remove.mutate({ id: deleting.id }, { onSuccess: () => setDeleting(null) })}
+      />
 
       <HistoryDialog
         open={Boolean(history)}

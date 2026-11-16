@@ -10,7 +10,7 @@ Backend repository: see `tracklab-backend` (.NET). It handles auth, talks to the
 |---|---|
 | **Login** | Log in with the assessment account. Validation, show/hide password, a friendly message when the session expires, and a redirect back to the page you came from |
 | **Dashboard** | Totals for requests, trackers and trackings, plus recent activity from the audit trail |
-| **Master Tracker** | CRUD trackers (feature 2): server-side paging, sorting on every column, search, page size, add/edit form with validation, parent-step picker, soft or permanent delete, per-record change history |
+| **Master Tracker** | CRUD trackers (feature 2): server-side paging, sorting on every column, search, page size, add/edit form with validation, parent-step picker, delete (deactivate), per-record change history |
 | **Lab Analysis Request** | CRUD requests (feature 3): paging, sorting, search, **Filter By** (project code / last status / receiving status, all or any condition), add/edit form, delete, history |
 | **Request → Tracking progress** | Timeline of every tracker step for one request: record, edit or remove a step (bonus FE, CRUD trackings). The value input matches the step's action type (date / text / file / none), and the request's *Last Status* can update automatically |
 | **Tracking Progress** | All trackings in one paged table, with full CRUD |
@@ -113,9 +113,10 @@ src/
 - **Trackings** come back joined with their tracker's fields (`trackerDescription`, `trackerIcon`…), so a step still shows correctly after its tracker has been deleted.
 - **Icons** are stored as free text in mixed styles (`fa-check`, `CheckCircle2`, `dna`); they're normalised and mapped to icons, with a neutral fallback for unknown names.
 - **Lists for dropdowns** are read through the paging endpoint, 100 rows per page.
+- **Delete** deactivates the record. The assessment API drops the body of DELETE requests, so the backend deactivates through the update endpoint instead, and permanent delete isn't offered (see the backend README).
 
 ## Design notes
 
 - The layout follows the provided TrackLab designs (green table headers, `…` row action menus, ✓/✗ boolean columns, "Show 10" and "Showing 1 to 10 of N entries").
-- Improvements: change history per record, a visual tracking timeline with a progress bar, the step value input matching the tracker's action type, automatic *Last Status* update, a filter panel that supports multiple values (`A||B`), soft vs permanent delete, and a mobile layout.
+- Improvements: change history per record, a visual tracking timeline with a progress bar, the step value input matching the tracker's action type, automatic *Last Status* update, a filter panel that supports multiple values (`A||B`), and a mobile layout.
 - There is no partner endpoint in the API, so the company dropdown lists partners from existing requests, with an option to type a partner ID.
