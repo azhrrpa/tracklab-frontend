@@ -33,6 +33,8 @@ type DataTableProps<T> = {
   emptyDescription?: string;
   emptyAction?: ReactNode;
   caption: string;
+  /** Column the API refused to sort by (the backend then used the default order). */
+  sortFallback?: string | null;
 };
 
 export function DataTable<T>({
@@ -50,6 +52,7 @@ export function DataTable<T>({
   emptyDescription,
   emptyAction,
   caption,
+  sortFallback,
 }: DataTableProps<T>) {
   if (loading) return <Spinner />;
   if (error && rows.length === 0) {
@@ -58,7 +61,13 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn("overflow-x-auto rounded-md border border-slate-200 transition-opacity", fetching && "opacity-60")}>
+    <>
+      {sortFallback && (
+        <p role="status" className="mb-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          This list can&apos;t be sorted by &ldquo;{sortFallback}&rdquo;, so it&apos;s shown in the default order.
+        </p>
+      )}
+      <div className={cn("overflow-x-auto rounded-md border border-slate-200 transition-opacity", fetching && "opacity-60")}>
       <table className="w-full min-w-max text-left text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-brand-600 text-xs font-semibold text-white">
@@ -113,7 +122,8 @@ export function DataTable<T>({
           )}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 }
 

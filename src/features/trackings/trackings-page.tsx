@@ -169,6 +169,7 @@ export function TrackingsPage() {
           sortBy={table.sortBy}
           sortOrder={table.sortOrder}
           onSort={table.toggleSort}
+          sortFallback={query.data?.sortFallback}
           emptyTitle={table.searchInput ? "No trackings match your search" : "No trackings yet"}
           emptyDescription="Record a step from a request's tracking progress page, or use Add."
         />

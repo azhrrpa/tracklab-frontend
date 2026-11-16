@@ -67,3 +67,10 @@ describe("Pagination", () => {
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 });
+
+describe("sort fallback notice", () => {
+  it("explains when the API couldn't sort by the chosen column", () => {
+    renderTable({ sortFallback: "createdOn" });
+    expect(screen.getByRole("status")).toHaveTextContent("can't be sorted by “createdOn”");
+  });
+});

@@ -98,6 +98,8 @@ export type LogRecord = {
 export type Paged<T> = {
   items: T[];
   total: number | null;
+  /** Set when the API couldn't sort by the requested column and the backend fell back to the default order. */
+  sortFallback?: string | null;
 };
 
 export type SortOrder = "ASC" | "DESC";

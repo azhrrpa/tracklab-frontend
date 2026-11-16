@@ -142,6 +142,7 @@ export function TrackersPage() {
           sortBy={table.sortBy}
           sortOrder={table.sortOrder}
           onSort={table.toggleSort}
+          sortFallback={query.data?.sortFallback}
           emptyTitle={table.searchInput ? "No trackers match your search" : "No trackers yet"}
           emptyDescription={table.searchInput ? "Try a different keyword." : "Add the first step of your flow."}
           emptyAction={!table.searchInput && can.create && <Button size="sm" onClick={openCreate}>Add tracker</Button>}

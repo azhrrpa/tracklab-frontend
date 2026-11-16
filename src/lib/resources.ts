@@ -10,7 +10,7 @@ export async function fetchPage<T>(resource: ResourceName, params: PageParams, s
     query: { ...params, search: params.search?.trim() || undefined },
     signal,
   });
-  return { items: extractList<T>(data), total: extractTotal(data, headers) };
+  return { items: extractList<T>(data), total: extractTotal(data, headers), sortFallback: headers.get("X-Sort-Fallback") };
 }
 
 export type AdvancedFilter = {
@@ -41,7 +41,7 @@ export async function fetchAdvancedPage<T>(
     },
     signal,
   });
-  return { items: extractList<T>(data), total: extractTotal(data, headers) };
+  return { items: extractList<T>(data), total: extractTotal(data, headers), sortFallback: headers.get("X-Sort-Fallback") };
 }
 
 const ALL_PAGE_SIZE = 100;

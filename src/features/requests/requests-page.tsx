@@ -35,8 +35,8 @@ export function toAdvancedFilter(values: FilterValues): AdvancedFilter {
 
 export function RequestsPage() {
   const router = useRouter();
-  // Newest first (created_on is the column behind requestDate; verified against the API).
-  const table = useTableState({ sortBy: "createdOn", sortOrder: "DESC" });
+  // Newest first. The requests table has request_date (no created_on), as found against the real API.
+  const table = useTableState({ sortBy: "requestDate", sortOrder: "DESC" });
   const [filterOpen, setFilterOpen] = useState(false);
   const [draftFilter, setDraftFilter] = useState<FilterValues>(emptyFilter);
   const [appliedFilter, setAppliedFilter] = useState<FilterValues>(emptyFilter);
@@ -119,7 +119,7 @@ export function RequestsPage() {
     },
     { key: "company", header: "Company Name", sortKey: "partnerId", cell: (r) => <span className="uppercase">{companyName(r)}</span> },
     { key: "projectCode", header: "Project Code", sortKey: "projectCode", cell: (r) => r.projectCode },
-    { key: "requestDate", header: "Request Date", sortKey: "createdOn", cell: (r) => formatDate(requestDate(r)) },
+    { key: "requestDate", header: "Request Date", sortKey: "requestDate", cell: (r) => formatDate(requestDate(r)) },
     { key: "lastStatus", header: "Last Status", sortKey: "lastStatus", cell: (r) => r.lastStatus ?? "-" },
     {
       key: "receivingStatus",
@@ -214,6 +214,7 @@ export function RequestsPage() {
           sortBy={table.sortBy}
           sortOrder={table.sortOrder}
           onSort={table.toggleSort}
+          sortFallback={query.data?.sortFallback}
           emptyTitle={activeFilterCount || table.searchInput ? "No requests match" : "No requests yet"}
           emptyDescription={activeFilterCount || table.searchInput ? "Try changing the search or filter." : "Create the first lab analysis request."}
           emptyAction={!activeFilterCount && !table.searchInput && can.create && <Button size="sm" onClick={openCreate}>Add request</Button>}
