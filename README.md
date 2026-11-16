@@ -113,6 +113,7 @@ src/
 - **Trackings** come back joined with their tracker's fields (`trackerDescription`, `trackerIcon`…), so a step still shows correctly after its tracker has been deleted.
 - **Icons** are stored as free text in mixed styles (`fa-check`, `CheckCircle2`, `dna`); they're normalised and mapped to icons, with a neutral fallback for unknown names.
 - **Lists for dropdowns** are read through the paging endpoint, 100 rows per page.
+- **Saved values are shown right away:** the request page applies the saved values itself instead of waiting for a refetch. The API caches reads, so a refetch straight after a write could show the old value.
 - **Delete** deactivates the record. The assessment API drops the body of DELETE requests, so the backend deactivates through the update endpoint instead, and permanent delete isn't offered (see the backend README).
 
 ## Design notes

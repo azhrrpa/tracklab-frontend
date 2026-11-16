@@ -11,12 +11,19 @@ import type { TrackingFormResult } from "@/features/trackings/tracking-form";
 /**
  * Saves a tracking and, if asked, moves the request's "Last Status" to the step's description,
  * so the request list always shows the latest step.
+ *
+ * The request on screen is updated with the saved status directly: refetching it straight after the
+ * write can return the previous value (the API caches reads), as seen while testing against it.
  */
 export function useRecordTracking() {
   const queryClient = useQueryClient();
 
   const refresh = () =>
-    Promise.all(["trackings", "requests", "audit"].map((key) => queryClient.invalidateQueries({ queryKey: [key] })));
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["trackings"] }),
+      queryClient.invalidateQueries({ queryKey: ["audit"] }),
+      queryClient.invalidateQueries({ queryKey: ["requests"], predicate: (query) => query.queryKey[1] !== "detail" }),
+    ]);
 
   const onError = (error: unknown) => {
     if (error instanceof ApiError && error.isUnauthorized) return;
@@ -36,11 +43,18 @@ export function useRecordTracking() {
         if (request && request.lastStatus !== tracker.description) {
           const values = { ...toRequestFormValues(request), lastStatus: tracker.description };
           await updateItem("requests", request.id, toRequestBody(values, true));
+          return { requestId: request.id, lastStatus: tracker.description };
         }
       }
+      return null;
     },
-    onSuccess: async (_, { trackingId }) => {
+    onSuccess: async (statusChange, { trackingId }) => {
       toast.success(trackingId ? "Tracking updated" : "Tracking saved");
+      if (statusChange) {
+        queryClient.setQueryData<LabRequest | null>(["requests", "detail", statusChange.requestId], (current) =>
+          current ? { ...current, lastStatus: statusChange.lastStatus } : current,
+        );
+      }
       await refresh();
     },
     onError,

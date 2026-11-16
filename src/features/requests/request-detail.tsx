@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, CheckCircle2, History, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -49,6 +49,7 @@ export function RequestDetail() {
     queryFn: ({ signal }) => fetchRequestTrackings(id, signal),
   });
   const trackersQuery = useAllResource<Tracker>("trackers");
+  const queryClient = useQueryClient();
   const { update } = useResourceMutations("requests", { singular: "Request" });
   const { save, remove } = useRecordTracking();
   const canTrack = usePermissions("trackings");
@@ -244,9 +245,21 @@ export function RequestDetail() {
         request={request}
         saving={update.isPending}
         onClose={() => setEditOpen(false)}
-        onSubmit={(values: RequestFormValues) =>
-          update.mutate({ id: request.id, body: toRequestBody(values, true) }, { onSuccess: () => setEditOpen(false) })
-        }
+        onSubmit={(values: RequestFormValues) => {
+          const body = toRequestBody(values, true);
+          update.mutate(
+            { id: request.id, body },
+            {
+              onSuccess: () => {
+                // Show what was saved, even if the refetch returned a cached (older) copy.
+                queryClient.setQueryData<LabRequest | null>(["requests", "detail", request.id], (current) =>
+                  current ? { ...current, ...body } : current,
+                );
+                setEditOpen(false);
+              },
+            },
+          );
+        }}
       />
 
       <HistoryDialog open={historyOpen} onClose={() => setHistoryOpen(false)} entity="request" entityId={request.id} title={`History of ${request.projectCode}`} />
