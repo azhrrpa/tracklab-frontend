@@ -46,10 +46,15 @@ export function fromDateInput(value: string | null | undefined) {
   return `${value}T00:00:00Z`;
 }
 
+/**
+ * Parses an API date. Dates before 1900 count as empty: when an optional date is left out, the API
+ * can store its default (0001-01-01), which means "not set" rather than a real date.
+ */
 function parseDate(value: string | null | undefined) {
   if (!value) return null;
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
+  if (Number.isNaN(date.getTime()) || date.getUTCFullYear() < 1900) return null;
+  return date;
 }
 
 export function shortId(id: string | null | undefined, length = 18) {

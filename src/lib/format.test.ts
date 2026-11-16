@@ -18,6 +18,8 @@ describe("dates", () => {
     expect(formatDate("2025-06-20T00:00:00")).toBe("20 Jun 2025");
     expect(formatDate(null)).toBe("-");
     expect(formatDate("garbage")).toBe("-");
+    expect(formatDate("0001-01-01T00:00:00")).toBe("-");
+    expect(toDateInput("0001-01-01T00:00:00Z")).toBe("");
   });
 
   it("round-trips <input type=date> values", () => {
