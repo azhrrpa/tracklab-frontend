@@ -1,123 +1,123 @@
-# TrackLab Web (Next.js frontend)
+# TrackLab Web (frontend Next.js)
 
-Web app for **TrackLab**: manage master trackers (the steps of a lab analysis flow), lab analysis requests, and each request's tracking progress. Built from the provided designs, with a few UX improvements.
+Aplikasi web untuk **TrackLab**: mengelola master tracker (langkah-langkah dalam alur analisis lab), request analisis lab, dan progres tracking setiap request. Dibangun berdasarkan desain yang diberikan, dengan beberapa peningkatan UX.
 
-Backend repository: see `tracklab-backend` (.NET). It handles auth, talks to the assessment API, and provides logging and the audit trail.
+Repositori backend: lihat `tracklab-backend` (.NET). Backend menangani auth, berkomunikasi dengan API assessment, serta menyediakan logging dan audit trail.
 
-## Features
+## Fitur
 
-| Page | What you can do |
+| Halaman | Yang bisa dilakukan |
 |---|---|
-| **Login** | Log in with the assessment account. Validation, show/hide password, a friendly message when the session expires, and a redirect back to the page you came from |
-| **Dashboard** | Totals for requests, trackers and trackings, plus recent activity from the audit trail |
-| **Master Tracker** | CRUD trackers (feature 2): server-side paging, sorting on every column, search, page size, add/edit form with validation, parent-step picker, delete (deactivate), per-record change history |
-| **Lab Analysis Request** | CRUD requests (feature 3): paging, sorting, search, **Filter By** (project code / last status / receiving status, all or any condition), add/edit form, delete, history |
-| **Request → Tracking progress** | Timeline of every tracker step for one request: record, edit or remove a step (bonus FE, CRUD trackings). The value input matches the step's action type (date / text / file / none), and the request's *Last Status* can update automatically |
-| **Tracking Progress** | All trackings in one paged table, with full CRUD |
-| **Audit Trail** | Who created, changed or deleted what, field by field, with filters |
-| **System Logs** | Backend log viewer (feature 4): filter by date, level and text, and click a request ID to see every log line of that request |
+| **Login** | Login dengan akun assessment. Validasi, tampilkan/sembunyikan password, pesan yang jelas saat sesi habis, dan kembali ke halaman asal setelah login |
+| **Dashboard** | Total request, tracker, dan tracking, ditambah aktivitas terbaru dari audit trail |
+| **Master Tracker** | CRUD tracker (fitur 2): paging di server, sort di setiap kolom, pencarian, ukuran halaman, form tambah/edit dengan validasi, pemilih parent step, delete (nonaktifkan), riwayat perubahan per record |
+| **Lab Analysis Request** | CRUD request (fitur 3): paging, sort, pencarian, **Filter By** (project code / last status / receiving status, semua atau salah satu kondisi), form tambah/edit, delete, riwayat |
+| **Request → Tracking progress** | Timeline semua langkah tracker untuk satu request: catat, edit, atau hapus langkah (bonus FE, CRUD trackings). Input nilai menyesuaikan action type langkahnya (tanggal / teks / file / tanpa nilai), dan *Last Status* request bisa ter-update otomatis |
+| **Tracking Progress** | Semua tracking dalam satu tabel ber-paging, dengan CRUD lengkap |
+| **Audit Trail** | Siapa membuat, mengubah, atau menghapus apa, per field, dengan filter |
+| **System Logs** | Penampil log backend (fitur 4): filter berdasarkan tanggal, level, dan teks, lalu klik request ID untuk melihat semua baris log dari request tersebut |
 
-Throughout the app: loading, empty and error states (errors show a reference ID that matches the backend logs), toasts, confirmation before deleting, keyboard and screen-reader friendly controls, and a responsive layout with a mobile sidebar.
+Di seluruh aplikasi: state loading, kosong, dan error (error menampilkan reference ID yang cocok dengan log backend), toast, konfirmasi sebelum menghapus, kontrol yang ramah keyboard dan screen reader, serta layout responsif dengan sidebar untuk mobile.
 
 ## Tech stack
 
 - **Next.js 16** (App Router, Cache Components) · **React 19** · **TypeScript**
-- **Tailwind CSS 4**, Poppins font (self-hosted via `@fontsource`), `lucide-react` icons
-- **TanStack Query** for server state (caching, refetch after writes, keeping the previous page while the next one loads)
-- **React Hook Form + Zod** for forms and validation
-- **Vitest + Testing Library** for unit and component tests
+- **Tailwind CSS 4**, font Poppins (self-hosted lewat `@fontsource`), ikon `lucide-react`
+- **TanStack Query** untuk server state (caching, refetch setelah operasi tulis, tetap menampilkan halaman sebelumnya selama halaman berikutnya dimuat)
+- **React Hook Form + Zod** untuk form dan validasi
+- **Vitest + Testing Library** untuk unit test dan component test
 
 ---
 
-## Getting started
+## Memulai
 
-### Prerequisites
+### Prasyarat
 
-- Node.js **20.9+** and npm
-- The backend running on `http://localhost:5080` (see the backend README)
+- Node.js **20.9+** dan npm
+- Backend berjalan di `http://localhost:5080` (lihat README backend)
 
-### 1. Install
+### 1. Instalasi
 
 ```bash
 npm install
-cp .env.example .env.local   # optional: only if the backend isn't on localhost:5080
+cp .env.example .env.local   # opsional: hanya jika backend tidak berjalan di localhost:5080
 ```
 
-`BACKEND_URL` is the only setting. No secrets live in the frontend.
+`BACKEND_URL` adalah satu-satunya pengaturan. Tidak ada rahasia yang disimpan di frontend.
 
-### 2. Run (development)
+### 2. Menjalankan (development)
 
 ```bash
 npm run dev
 ```
 
-Open **http://localhost:3000** and log in with the account from the assessment brief (`assessment.it`).
+Buka **http://localhost:3000** dan login dengan akun dari brief assessment (`assessment.it`).
 
-### 3. Build and run (production)
+### 3. Build dan menjalankan (production)
 
 ```bash
 npm run build
 npm start
 ```
 
-`BACKEND_URL` is read at build time for the `/api` rewrite, so set it before `npm run build`.
+`BACKEND_URL` dibaca saat build untuk rewrite `/api`, jadi atur nilainya sebelum menjalankan `npm run build`.
 
-### 4. Test and check
+### 4. Testing dan pengecekan
 
 ```bash
-npm test            # Vitest: unit and component tests
-npm run lint        # ESLint (Next.js + React Hooks rules)
+npm test            # Vitest: unit test dan component test
+npm run lint        # ESLint (aturan Next.js + React Hooks)
 npm run typecheck   # TypeScript
 ```
 
-The tests cover the API client (CSRF header, correlation ID, ProblemDetails to readable errors, 401 handling), response normalisation, formatting (rupiah, dates), form schemas, the request filter, the tracking timeline, open-redirect protection on login, the data table and pagination, and the login form.
+Test mencakup API client (header CSRF, correlation ID, ProblemDetails menjadi pesan yang mudah dibaca, penanganan 401), normalisasi respons, format (rupiah, tanggal), schema form, filter request, timeline tracking, proteksi open redirect di halaman login, tabel data dan pagination, serta form login.
 
-**Migrations:** none. The frontend has no database.
+**Migrasi:** tidak ada. Frontend tidak memiliki database.
 
 ---
 
-## How it talks to the backend
+## Cara frontend berkomunikasi dengan backend
 
 ```
-Browser ──► Next.js /api/* ──rewrite──► TrackLab.Api (.NET) ──► Assessment API
+Browser ──► Next.js /api/* ──rewrite──► TrackLab.Api (.NET) ──► API assessment
 ```
 
-- `next.config.ts` rewrites `/api/*` to `BACKEND_URL`. Calls are same-origin, so the backend's **HttpOnly session cookies** work without CORS, and the browser never sees an access token.
-- `src/lib/api-client.ts` wraps `fetch`. It adds `X-Requested-With` to `POST`/`PUT`/`DELETE` (the backend's CSRF check) and an `X-Correlation-Id` to every call, turns ProblemDetails errors into readable messages, and sends the user to `/login?expired=1` on any `401`.
-- `src/proxy.ts` (Next.js 16's name for middleware) redirects to `/login` when there is no session cookie. This only avoids showing pages the user can't use; the backend still checks every request.
-- `src/lib/client-logger.ts` reports uncaught errors and failed data requests to the backend log (`POST /api/logs/client`).
-- `src/lib/normalize.ts` reads the API's `{ data, success, message, code }` envelope and accepts both `camelCase` and `snake_case` field names.
+- `next.config.ts` me-rewrite `/api/*` ke `BACKEND_URL`. Panggilan bersifat same-origin, sehingga **cookie sesi HttpOnly** dari backend bekerja tanpa CORS, dan browser tidak pernah melihat access token.
+- `src/lib/api-client.ts` membungkus `fetch`. Modul ini menambahkan `X-Requested-With` pada `POST`/`PUT`/`DELETE` (pengecekan CSRF di backend) dan `X-Correlation-Id` pada setiap panggilan, mengubah error ProblemDetails menjadi pesan yang mudah dibaca, dan mengarahkan user ke `/login?expired=1` setiap kali mendapat `401`.
+- `src/proxy.ts` (nama baru middleware di Next.js 16) mengarahkan ke `/login` jika tidak ada cookie sesi. Ini hanya untuk menghindari menampilkan halaman yang tidak bisa dipakai user; backend tetap memeriksa setiap request.
+- `src/lib/client-logger.ts` melaporkan error yang tidak tertangani dan request data yang gagal ke log backend (`POST /api/logs/client`).
+- `src/lib/normalize.ts` membaca envelope `{ data, success, message, code }` dari API dan menerima nama field `camelCase` maupun `snake_case`.
 
-## Project structure
+## Struktur project
 
 ```
 src/
-├── app/                    # Routes (App Router)
-│   ├── login/              # Public login page
-│   └── (app)/              # Pages behind login, sharing the sidebar layout
+├── app/                    # Route (App Router)
+│   ├── login/              # Halaman login publik
+│   └── (app)/              # Halaman di balik login, berbagi layout sidebar
 │       ├── dashboard/  trackers/  requests/  requests/[id]/  trackings/  audit-trail/  logs/
-├── features/               # Feature code: page components, forms, hooks
+├── features/               # Kode per fitur: komponen halaman, form, hooks
 │   ├── auth/  trackers/  requests/  trackings/  audit/  logs/  dashboard/
 ├── components/
-│   ├── ui/                 # Button, form controls, modal, data table, pagination, row menu…
-│   └── layout/             # App shell (sidebar, top bar), page header
-├── hooks/                  # Paged/all resource queries, mutations, table state
-├── lib/                    # API client, resources, normalisation, formatting, types, client logger
-└── proxy.ts                # Route protection
+│   ├── ui/                 # Button, kontrol form, modal, tabel data, pagination, menu baris…
+│   └── layout/             # App shell (sidebar, top bar), header halaman
+├── hooks/                  # Query resource (paged/all), mutation, state tabel
+├── lib/                    # API client, resource, normalisasi, format, tipe, client logger
+└── proxy.ts                # Proteksi route
 ```
 
-## Notes on the API data
+## Catatan tentang data API
 
-- **Company name:** requests only carry `partnerId` and there is no partner endpoint. `src/lib/partners.ts` maps known ids to names. Every request in the shared data uses `93f25c4d…` (the id in the Postman examples), shown as *PT KALBE FARMA TBK* as in the design. Unknown ids show as "Partner XXXXXXXX".
-- **Due date** is computed by the API (`requestDate` + `leadTime` days), so it's shown read-only on the request page.
-- **Trackings** come back joined with their tracker's fields (`trackerDescription`, `trackerIcon`…), so a step still shows correctly after its tracker has been deleted.
-- **Icons** are stored as free text in mixed styles (`fa-check`, `CheckCircle2`, `dna`); they're normalised and mapped to icons, with a neutral fallback for unknown names.
-- **Lists for dropdowns** are read through the paging endpoint, 100 rows per page.
-- **Saved values are shown right away:** the request page applies the saved values itself instead of waiting for a refetch. The API caches reads, so a refetch straight after a write could show the old value.
-- **Delete** deactivates the record. The assessment API drops the body of DELETE requests, so the backend deactivates through the update endpoint instead, and permanent delete isn't offered (see the backend README).
+- **Nama perusahaan:** request hanya membawa `partnerId` dan tidak ada endpoint partner. `src/lib/partners.ts` memetakan id yang dikenal ke nama perusahaan. Semua request di data bersama memakai `93f25c4d…` (id pada contoh Postman), yang ditampilkan sebagai *PT KALBE FARMA TBK* sesuai desain. Id yang tidak dikenal ditampilkan sebagai "Partner XXXXXXXX".
+- **Due date** dihitung oleh API (`requestDate` + `leadTime` hari), jadi ditampilkan read-only di halaman request.
+- **Trackings** dikembalikan sudah di-join dengan field tracker-nya (`trackerDescription`, `trackerIcon`…), sehingga sebuah langkah tetap tampil dengan benar meski tracker-nya sudah dihapus.
+- **Ikon** disimpan sebagai teks bebas dengan gaya penulisan yang beragam (`fa-check`, `CheckCircle2`, `dna`); nama ikon dinormalisasi dan dipetakan ke ikon yang sesuai, dengan ikon netral untuk nama yang tidak dikenal.
+- **Daftar untuk dropdown** dibaca lewat endpoint paging, 100 baris per halaman.
+- **Nilai yang disimpan langsung ditampilkan:** halaman request menerapkan nilai yang baru disimpan secara langsung, tanpa menunggu refetch. API meng-cache read, sehingga refetch tepat setelah operasi tulis bisa menampilkan nilai lama.
+- **Delete** menonaktifkan record. API assessment membuang body request DELETE, jadi backend menonaktifkan record lewat endpoint update, dan delete permanen tidak disediakan (lihat README backend).
 
-## Design notes
+## Catatan desain
 
-- The layout follows the provided TrackLab designs (green table headers, `…` row action menus, ✓/✗ boolean columns, "Show 10" and "Showing 1 to 10 of N entries").
-- Improvements: change history per record, a visual tracking timeline with a progress bar, the step value input matching the tracker's action type, automatic *Last Status* update, a filter panel that supports multiple values (`A||B`), and a mobile layout.
-- There is no partner endpoint in the API, so the company dropdown lists partners from existing requests, with an option to type a partner ID.
+- Layout mengikuti desain TrackLab yang diberikan (header tabel hijau, menu aksi baris `…`, kolom boolean ✓/✗, "Show 10" dan "Showing 1 to 10 of N entries").
+- Peningkatan: riwayat perubahan per record, timeline tracking visual dengan progress bar, input nilai langkah yang menyesuaikan action type tracker, update *Last Status* otomatis, panel filter yang mendukung banyak nilai (`A||B`), dan layout mobile.
+- API tidak memiliki endpoint partner, jadi dropdown perusahaan menampilkan partner dari request yang sudah ada, dengan opsi mengetik partner ID secara manual.
